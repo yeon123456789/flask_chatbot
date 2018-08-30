@@ -2,6 +2,7 @@ import os
 #json으로 바꾸기 위해 라이브러리 추가
 import json
 import random
+import requests
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -28,6 +29,7 @@ def message():
     
     # content라는 key의 value를 msg에 저장
     msg = request.json['content']
+    img_bool = False
     
     if msg == "메뉴":
         menu = ["버거킹", "북창동순두부", "아비꼬카레", "서브웨이"]
@@ -40,14 +42,26 @@ def message():
         pick = random.sample(numbers, 6)
         # 정렬 후 스트링으로 변환하여 저장
         return_msg = str(sorted(pick))
-    
+        
+    elif msg == "고양이":
+        img_bool = True
+        url = "https://api.thecatapi.com/v1/images/search?mime_types=jpg"
+        req = requests.get(url).json()
+        # print(req[0]['url'])
+        cat_url = req[0]['url']
     else:
         return_msg = "현재 '메뉴'와 '로또'만 지원합니다."
     
-    json_return = {
-        "message": {
-            "text": return_msg
-        },
+    if img_bool == True:
+            json_return = {
+                            "message": {
+                            "text": "나도 고양이 키우고 싶다아",
+                            "photo": {
+                                "url": cat_url,
+                                "width":720,
+                                "height":640
+                                }
+                            },
         "keyboard": {
                         "type" : "buttons",
                         "buttons" : ["메뉴", "로또", "고양이", "영화"]
