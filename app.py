@@ -1,6 +1,7 @@
 import os
 #json으로 바꾸기 위해 라이브러리 추가
 import json
+import random
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -18,7 +19,7 @@ def keyboard():
     "buttons" : ["메뉴", "로또", "고양이", "영화"]
     }
     
-    #딕셔너리를 json으로 바꿔서 리턴해주기 위함 코드
+    #딕셔너리를 json으로 바꿔서 리턴해주기 위한 코드
     json_keyboard = json.dumps(keyboard)
     return json_keyboard
 
@@ -28,9 +29,24 @@ def message():
     # content라는 key의 value를 msg에 저장
     msg = request.json['content']
     
+    if msg == "메뉴":
+        menu = ["버거킹", "북창동순두부", "아비꼬카레", "서브웨이"]
+        return_msg = random.choice(menu)
+        
+    elif msg == "로또":
+        # 1~45 리스트
+        numbers = list(range(1, 46))
+        # 6개 샘플링
+        pick = random.sample(numbers, 6)
+        # 정렬 후 스트링으로 변환하여 저장
+        return_msg = str(sorted(pick))
+    
+    else:
+        return_msg = "현재 '메뉴'와 '로또'만 지원합니다."
+    
     json_return = {
         "message": {
-            "text": msg
+            "text": return_msg
         },
         "keyboard": {
                         "type" : "buttons",
