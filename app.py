@@ -18,7 +18,7 @@ def keyboard():
     #keyboard 딕셔너리 생성
     keyboard = {
     "type" : "buttons",
-    "buttons" : ["메뉴", "로또", "고양이", "영화"]
+    "buttons" : ["메뉴", "로또", "고양이", "영화", "벅스-뮤직PD앨범"]
     }
     
     #딕셔너리를 json으로 바꿔서 리턴해주기 위한 코드
@@ -77,6 +77,9 @@ def message():
         
         return_msg = "%s/ 평점 :%s/ 예매율: %s" % (pick_movie['title'],pick_movie['star'],pick_movie['reserve'])
         img_url = pick_movie['img']
+        
+    elif msg == "벅스-뮤직PD앨범":
+        
         
     else:
         return_msg = "현재 '메뉴'와 '로또'만 지원합니다."
