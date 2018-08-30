@@ -4,6 +4,7 @@ import json
 import random
 import requests
 from flask import Flask, request, jsonify
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -47,17 +48,45 @@ def message():
         img_bool = True
         url = "https://api.thecatapi.com/v1/images/search?mime_types=jpg"
         req = requests.get(url).json()
+        return_msg = "나만 고양이 없잖아아아아 :-("
         # print(req[0]['url'])
-        cat_url = req[0]['url']
+        img_url = req[0]['url']
+        
+    elif msg == "영화":
+        img_bool = True
+        
+        url = "https://movie.naver.com/movie/running/current.nhn"
+        req = requests.get(url).text
+        doc = BeautifulSoup(req, 'html.parser')
+        
+        title_tag = doc.select('dt.tit > a')
+        star_tag = doc.select('div.star_t1 > a > span.num')
+        reserve_tag = doc.select('div.star_t1.b_star > span.num')
+        img_tag = doc.select('div.thumb > a > img')
+        
+        movie_dic = {}
+        for i in range(0,10):
+            movie_dic[i] = {
+                            "title":title_tag[i].text,
+                            "star":star_tag[i].text,
+                            "reserve":reserve_tag[i].text,
+                            "img":img_tag[i].get('src')
+                            }
+
+        pick_movie = movie_dic[random.randrange(0,10)]
+        
+        return_msg = "%s/ 평점 :%s/ 예매율: %s" % (pick_movie['title'],pick_movie['star'],pick_movie['reserve'])
+        img_url = pick_movie['img']
+        
     else:
         return_msg = "현재 '메뉴'와 '로또'만 지원합니다."
     
     if img_bool == True:
             json_return = {
                             "message": {
-                            "text": "나도 고양이 키우고 싶다아",
+                            "text": return_msg,
                             "photo": {
-                                "url": cat_url,
+                                "url": img_url,
                                 "width":720,
                                 "height":640
                                 }
@@ -67,6 +96,16 @@ def message():
                         "buttons" : ["메뉴", "로또", "고양이", "영화"]
                     }
     }
+    else:
+        json_return = {
+            "message": {
+                "text": return_msg
+            },
+        "keyboard": {
+                        "type" : "buttons",
+                        "buttons" : ["메뉴", "로또", "고양이", "영화"]
+                    }
+        }
     
     return jsonify(json_return)
     
